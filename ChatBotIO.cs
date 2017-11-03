@@ -55,7 +55,7 @@ public class ChatBotIO : MonoBehaviour {
 		url = url + "&user_key=" + userkey;
 
 		//Debug.Log (url);
-		WWW www = new WWW(url, new byte[](0));
+		WWW www = new WWW(url, new byte[]{0}); 
 
 		yield return www;
 
