@@ -1,6 +1,7 @@
 Microsoft Hololens
 =============================
-Unity + Chatscript
+Unity(2017.2) + Chatscript
+
 Pandorabots
 
 Referneces:
