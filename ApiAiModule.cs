@@ -58,7 +58,7 @@ public class ApiAiModule : MonoBehaviour
             return true;
         };
             
-		const string ACCESS_TOKEN = "990017a2d9eb432da0b180239cb81f0c";
+		const string ACCESS_TOKEN = "";
 
         var config = new AIConfiguration(ACCESS_TOKEN, SupportedLanguage.English);
 
