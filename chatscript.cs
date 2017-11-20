@@ -7,7 +7,7 @@ using System.Text;
 
 public class ChatBotIO : MonoBehaviour {
 
-	protected string text,answer;
+    protected string text,answer;
 
     private Socket m_Socekt;
     public string IPAdress = "165.132.106.225";
