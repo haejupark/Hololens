@@ -11,9 +11,9 @@ public class ChatBotIO : MonoBehaviour
 
     private Socket m_Socekt;
 
-    public string IPAdress = "165.132.106.225";
-    public const int port = 1024;
-    public string username = "yonsei";
+    public string IPAdress = "";
+    public const int port = ;
+    public string username = "";
     public string bot = "harry";
 
     private int SenddataLength;
