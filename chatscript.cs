@@ -14,7 +14,7 @@ public class ChatBotIO : MonoBehaviour
     public string IPAdress = "";
     public const int port = ;
     public string username = "";
-    public string bot = "harry";
+    public string bot = "";
 
     private int SenddataLength;
     private int ReceivedataLength;
@@ -31,9 +31,13 @@ public class ChatBotIO : MonoBehaviour
 
     public void SendText(string text)
     {
+        Receivebyte = new byte[2000];
         m_Socekt = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         IPAddress ipAddr = IPAddress.Parse(IPAdress);
         IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port);
+        TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
+
+        answerObject.text = "";
         try
         {
             m_Socekt.Connect(ipEndPoint);
@@ -55,15 +59,17 @@ public class ChatBotIO : MonoBehaviour
             Sendbyte = Encoding.Default.GetBytes(sb.ToString());
             m_Socekt.Send(Sendbyte, Sendbyte.Length, 0);
             //receive
-            m_Socekt.Receive(Receivebyte); 
+            m_Socekt.Receive(Receivebyte);
             ReceiveString = Encoding.Default.GetString(Receivebyte);
+            Debug.Log(Receivebyte);
             ReceivedataLength = Encoding.Default.GetByteCount(ReceiveString.ToString());
             Debug.Log("Receive Data : " + ReceiveString + "(" + ReceivedataLength + ")");
 
-            TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
+         
             answerObject.text = ReceiveString;
 
             m_Socekt.Close();
+            m_Socekt = null;
         }
         catch (SocketException ex)
         {
@@ -80,7 +86,7 @@ public class ChatBotIO : MonoBehaviour
         text = GUI.TextArea(new Rect(10, Screen.height - 60, EDIT_WIDTH + LABEL_WIDTH, 50), text, 512);
         if (text.Contains("\n") || text.Contains("..."))
         {
-            SendText(text);  
+            SendText(text);
             text = "";
         }
         GUI.Label(new Rect(10, Screen.height - 80, 300, 20), "Say: ");
