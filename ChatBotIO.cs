@@ -35,18 +35,15 @@ public class ChatBotIO : MonoBehaviour
 		w.AddField ("unity", text);
 
 
-		UnityWebRequest www = UnityWebRequest.Post ("", w);
+		UnityWebRequest www = UnityWebRequest.Post ("http://pcdeepruby.yonsei.ac.kr:80/unity/api", w);
 		yield return www.Send();
 
 		TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
 		var ourText = www.downloadHandler.text;
-		Debug.Log (ourText);
+		//Debug.Log (ourText);
 		var myObject = JsonUtility.FromJson<MyClass> (ourText);
-		Debug.Log (myObject.response_smalltalk);
-		//Debug.Log (json);
+		//Debug.Log (myObject.isSmalltalk);
 	
-		//string response_smalltalk = ourText.Substring(;
-
 		answerObject.text = myObject.response_smalltalk;	
 
 	}
