@@ -1,89 +1,75 @@
-﻿ using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Collections;
+using System.IO;
+using System.Collections.Generic;
+using UnityEngine.Networking;
 
-public class ChatBotIO : MonoBehaviour {
-
-	protected string text, response;
-	protected string sessionId;
-	protected bool waiting;
-
-	public string botid = "";
-	public string appid = "";
-	public string userkey = "";
-
-
-	// Use this for initialization
-	void Start () {
+public class ChatBotIO : MonoBehaviour
+{
+	public class MyClass
+	{
+		public string spo_baseline;
+		public string spo_ours;
+		public string response_base;
+		public string response_ours;
+		public string response_smalltalk;
+		public bool isSmalltalk;
+		public string sentiment;
+	}
+    protected string text;
+	WWW www;
+    // Use this for initialization
+	void Start() {
+		//StartCoroutine (Upload ());
+	}
+	void Awake()
+	{
 		text = "";
-		response = "Waiting for text";
 	}
+
+	IEnumerator SendmyData(string text){
+		WWWForm w = new WWWForm ();
+		w.AddField ("unity", text);
+
+
+		UnityWebRequest www = UnityWebRequest.Post ("", w);
+		yield return www.Send();
+
+		TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
+		var ourText = www.downloadHandler.text;
+		Debug.Log (ourText);
+		var myObject = JsonUtility.FromJson<MyClass> (ourText);
+		Debug.Log (myObject.response_smalltalk);
+		//Debug.Log (json);
 	
-	// Update is called once per frame
-	void Update () {
-		
+		//string response_smalltalk = ourText.Substring(;
+
+		answerObject.text = myObject.response_smalltalk;	
+
 	}
 
-	string sanitizePandoraResponse(string wwwText)
-	{
-		string responseString = "";
 
-		int startIndex = wwwText.IndexOf (" [") + 2;
-		int endIndex = wwwText.IndexOf ("].");
-		responseString = wwwText.Substring (startIndex, endIndex - startIndex);
-
-		Debug.Log ("Sanitized response: " + responseString);
-		return responseString;
-	}
-	void getSessionIdOfPandoraResponse(string wwwText)
-	{
-		int startIndex = wwwText.IndexOf ("sessionId") + 12;
-		int endIndex = wwwText.IndexOf ("]") - 1;
-
-		sessionId = wwwText.Substring (startIndex, endIndex - startIndex);
+    public void SendText(string text)
+    {
+        //TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
+		StartCoroutine (SendmyData (text));
+		//answerObject.text = "";
 	}
 
-	private IEnumerator PandoraBotRequestCoRoutine(string text)
-	{
-		//waiting = true;
-		string url = "https://aiaas.pandorabots.com/talk/" + appid;
-		url = url + "/" + botid;
-		url = url + "?input=" + WWW.EscapeURL (text);
-		if (sessionId != null) {
-			url = url + "&sessionID=" + sessionId;
-		}
-		url = url + "&user_key=" + userkey;
+    void OnGUI()
+    {
+        int LABEL_WIDTH = 90;
+        int EDIT_WIDTH = 250;
 
-		//Debug.Log (url);
-		WWW www = new WWW(url, new byte[]{0}); 
-
-		yield return www;
-
-		if(www.error == null)
-		{
-			//Debug.Log(www.text);
-			getSessionIdOfPandoraResponse(www.text);
-			//Debug.Log("SessionId:" + sessionId + ".");
-
-			response = sanitizePandoraResponse(www.text);
-		}
-		else
-		{
-			Debug.LogWarning(www.error);
-		}
-	}
-	void OnGUI()
-	{
-		int LABEL_WIDTH = 90;
-		int EDIT_WIDTH = 250;
-
-		text = GUI.TextArea(new Rect(10, Screen.height - 60, EDIT_WIDTH + LABEL_WIDTH, 50), text, 512);
-
-		if (text.Contains ("\n") || text.Contains ("...")) {
-			StartCoroutine (PandoraBotRequestCoRoutine (text));
-			text = ""; 
-		}
-		GUI.Label(new Rect(10, Screen.height - 80, 300, 20), "Type something below and hit enter!");
-				
-	}
+        text = GUI.TextArea(new Rect(10, Screen.height - 60, EDIT_WIDTH + LABEL_WIDTH, 50), text, 512);
+        if (text.Contains("\n") || text.Contains("..."))
+        {
+			SendText(text);
+			text = "";
+        }
+        GUI.Label(new Rect(10, Screen.height - 80, 300, 20), "Say: ");
+    }
 }
