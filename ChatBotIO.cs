@@ -6,6 +6,7 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Networking;
+using System.Linq;
 
 public class ChatBotIO : MonoBehaviour
 {
@@ -18,13 +19,17 @@ public class ChatBotIO : MonoBehaviour
 		public string response_smalltalk;
 		public bool isSmalltalk;
 		public string sentiment;
+		public List<int> senti_base;
+		public List<int> senti_small;
+		public List<int> senti_query;
 	}
+	// emotion
+	// "anger", "anticipation", "disgust", "fear", "joy", "sadness", "surprise", "trust"
+
     protected string text;
 	WWW www;
-    // Use this for initialization
-	void Start() {
-		//StartCoroutine (Upload ());
-	}
+
+	void Start() { }
 	void Awake()
 	{
 		text = "";
@@ -35,25 +40,26 @@ public class ChatBotIO : MonoBehaviour
 		w.AddField ("unity", text);
 
 
-		UnityWebRequest www = UnityWebRequest.Post ("http://pcdeepruby.yonsei.ac.kr:80/unity/api", w);
+		UnityWebRequest www = UnityWebRequest.Post ("url", w);
 		yield return www.Send();
 
 		TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
 		var ourText = www.downloadHandler.text;
-		//Debug.Log (ourText);
+		Debug.Log (ourText);
 		var myObject = JsonUtility.FromJson<MyClass> (ourText);
-		//Debug.Log (myObject.isSmalltalk);
-	
-		answerObject.text = myObject.response_smalltalk;	
 
+		if (myObject.isSmalltalk == true) {
+			answerObject.text = myObject.response_smalltalk;
+		} else {
+			answerObject.text = myObject.response_base;
+		}
+	
 	}
 
 
     public void SendText(string text)
     {
-        //TextMesh answerObject = GameObject.Find("answer").GetComponent<TextMesh>();
 		StartCoroutine (SendmyData (text));
-		//answerObject.text = "";
 	}
 
     void OnGUI()
